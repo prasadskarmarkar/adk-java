@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
+             version="3.0">
+  <persistence-unit name="adk-sessions" transaction-type="RESOURCE_LOCAL">
+    <description>Persistence unit for ADK Database Session Service</description>
+
+    <class>com.google.adk.sessions.db.entity.StorageSession</class>
+    <class>com.google.adk.sessions.db.entity.StorageEvent</class>
+    <class>com.google.adk.sessions.db.entity.StorageAppState</class>
+    <class>com.google.adk.sessions.db.entity.StorageUserState</class>
+
+    <properties>
+      <!-- These properties are overridden by the ones provided programmatically -->
+      <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/>
+      <property name="hibernate.hbm2ddl.auto" value="none"/>
+      <property name="hibernate.show_sql" value="false"/>
+      <property name="hibernate.format_sql" value="false"/>
+
+      <!-- JDBC connection pool -->
+      <property name="hibernate.connection.provider_class"
+                value="org.hibernate.hikaricp.internal.HikariCPConnectionProvider"/>
+      <property name="hibernate.hikari.minimumIdle" value="5"/>
+      <property name="hibernate.hikari.maximumPoolSize" value="20"/>
+      <property name="hibernate.hikari.idleTimeout" value="30000"/>
+
+      <!-- Lock timeout configuration (10 seconds) -->
+      <!-- Maximum time to wait for a PESSIMISTIC_READ or PESSIMISTIC_WRITE lock -->
+      <property name="jakarta.persistence.lock.timeout" value="10000"/>
+
+      <!-- HikariCP connection timeout (30 seconds) -->
+      <!-- Maximum time a thread will wait for a connection from the pool -->
+      <property name="hibernate.hikari.connectionTimeout" value="30000"/>
+
+      <!-- Connection leak detection threshold (5 seconds) -->
+      <!-- Logs a warning if a connection is held longer than this -->
+      <property name="hibernate.hikari.leakDetectionThreshold" value="5000"/>
+
+      <!-- Maximum connection lifetime (30 minutes) -->
+      <!-- Connections will be closed after this time to prevent stale connections -->
+      <property name="hibernate.hikari.maxLifetime" value="1800000"/>
+
+      <!-- Transaction isolation level -->
+      <!-- READ_COMMITTED (2) provides good balance of consistency and performance -->
+      <property name="hibernate.connection.isolation" value="2"/>
+    </properties>
+  </persistence-unit>
+</persistence>
