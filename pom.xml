@@ -303,6 +303,11 @@
         <artifactId>assertj-core</artifactId>
         <version>${assertj.version}</version>
       </dependency>
+      <dependency>
+        <groupId>net.javacrumbs.future-converter</groupId>
+        <artifactId>future-converter-java8-guava</artifactId>
+        <version>${future-converter-java8-guava.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
