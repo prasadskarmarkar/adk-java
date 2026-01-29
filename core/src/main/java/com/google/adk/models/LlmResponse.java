@@ -106,6 +106,10 @@ public abstract class LlmResponse extends JsonBaseModel {
   @JsonProperty("modelVersion")
   public abstract Optional<String> modelVersion();
 
+  /** The interaction ID from the Interactions API response. */
+  @JsonProperty("interactionId")
+  public abstract Optional<String> interactionId();
+
   public abstract Builder toBuilder();
 
   /** Builder for constructing {@link LlmResponse} instances. */
@@ -174,6 +178,11 @@ public abstract class LlmResponse extends JsonBaseModel {
     public abstract Builder modelVersion(@Nullable String modelVersion);
 
     public abstract Builder modelVersion(Optional<String> modelVersion);
+
+    @JsonProperty("interactionId")
+    public abstract Builder interactionId(@Nullable String interactionId);
+
+    public abstract Builder interactionId(Optional<String> interactionId);
 
     @CanIgnoreReturnValue
     public final Builder response(GenerateContentResponse response) {

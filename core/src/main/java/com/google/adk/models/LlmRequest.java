@@ -88,6 +88,15 @@ public abstract class LlmRequest extends JsonBaseModel {
   @JsonIgnore
   public abstract Map<String, BaseTool> tools();
 
+  /**
+   * Returns the previous interaction ID for stateful conversation chaining via the Interactions
+   * API.
+   *
+   * @return An optional string representing the previous interaction ID.
+   */
+  @JsonProperty("previousInteractionId")
+  public abstract Optional<String> previousInteractionId();
+
   /** returns the first system instruction text from the request if present. */
   @JsonIgnore
   public Optional<String> getFirstSystemInstruction() {
@@ -116,7 +125,8 @@ public abstract class LlmRequest extends JsonBaseModel {
     return new AutoValue_LlmRequest.Builder()
         .tools(ImmutableMap.of())
         .contents(ImmutableList.of())
-        .liveConnectConfig(LiveConnectConfig.builder().build());
+        .liveConnectConfig(LiveConnectConfig.builder().build())
+        .previousInteractionId(Optional.empty());
   }
 
   public abstract Builder toBuilder();
@@ -154,6 +164,13 @@ public abstract class LlmRequest extends JsonBaseModel {
     abstract Builder tools(Map<String, BaseTool> tools);
 
     abstract Map<String, BaseTool> tools();
+
+    @CanIgnoreReturnValue
+    @JsonProperty("previousInteractionId")
+    public abstract Builder previousInteractionId(String previousInteractionId);
+
+    @CanIgnoreReturnValue
+    public abstract Builder previousInteractionId(Optional<String> previousInteractionId);
 
     @CanIgnoreReturnValue
     public final Builder appendInstructions(List<String> instructions) {
