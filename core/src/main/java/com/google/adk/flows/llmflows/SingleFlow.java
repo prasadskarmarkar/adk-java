@@ -28,6 +28,7 @@ public class SingleFlow extends BaseLlmFlow {
       ImmutableList.of(
           new Basic(),
           new RequestConfirmationLlmRequestProcessor(),
+          new InteractionsRequestProcessor(),
           new Instructions(),
           new Identity(),
           new Contents(),

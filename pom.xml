@@ -34,8 +34,10 @@
     <module>contrib/spring-ai</module>
     <module>contrib/samples</module>
     <module>contrib/firestore-session-service</module>
+    <module>contrib/database-session-service</module>
     <module>tutorials/city-time-weather</module>
     <module>tutorials/live-audio-single-agent</module>
+    <module>tutorials/database-session-demo</module>
     <module>a2a</module>
     <module>a2a/webservice</module>
   </modules>
@@ -50,7 +52,7 @@
     <otel.version>1.49.0</otel.version>
     <mcp.version>0.14.0</mcp.version>
     <errorprone.version>2.38.0</errorprone.version>
-    <google.genai.version>1.32.0</google.genai.version>
+    <google.genai.version>1.38.0-SNAPSHOT</google.genai.version>
     <protobuf.version>4.32.0</protobuf.version>
     <junit.version>5.11.4</junit.version>
     <mockito.version>5.20.0</mockito.version>

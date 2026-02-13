@@ -673,7 +673,8 @@ public abstract class BaseLlmFlow implements BaseFlow {
             .avgLogprobs(llmResponse.avgLogprobs())
             .finishReason(llmResponse.finishReason())
             .usageMetadata(llmResponse.usageMetadata())
-            .modelVersion(llmResponse.modelVersion());
+            .modelVersion(llmResponse.modelVersion())
+            .interactionId(llmResponse.interactionId());
 
     Event event = eventBuilder.build();
 
