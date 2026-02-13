@@ -62,6 +62,7 @@ public class Event extends JsonBaseModel {
   private Optional<String> branch = Optional.empty();
   private Optional<GroundingMetadata> groundingMetadata = Optional.empty();
   private Optional<String> modelVersion = Optional.empty();
+  private Optional<String> interactionId = Optional.empty();
   private long timestamp;
 
   private Event() {}
@@ -252,6 +253,16 @@ public class Event extends JsonBaseModel {
     this.modelVersion = modelVersion;
   }
 
+  /** The interaction ID from the Interactions API response. */
+  @JsonProperty("interactionId")
+  public Optional<String> interactionId() {
+    return interactionId;
+  }
+
+  public void setInteractionId(Optional<String> interactionId) {
+    this.interactionId = interactionId;
+  }
+
   /** The timestamp of the event. */
   @JsonProperty("timestamp")
   public long timestamp() {
@@ -347,6 +358,7 @@ public class Event extends JsonBaseModel {
     private Optional<String> branch = Optional.empty();
     private Optional<GroundingMetadata> groundingMetadata = Optional.empty();
     private Optional<String> modelVersion = Optional.empty();
+    private Optional<String> interactionId = Optional.empty();
     private Optional<Long> timestamp = Optional.empty();
 
     @JsonCreator
@@ -586,6 +598,23 @@ public class Event extends JsonBaseModel {
       return modelVersion;
     }
 
+    @CanIgnoreReturnValue
+    @JsonProperty("interactionId")
+    public Builder interactionId(@Nullable String value) {
+      this.interactionId = Optional.ofNullable(value);
+      return this;
+    }
+
+    @CanIgnoreReturnValue
+    public Builder interactionId(Optional<String> value) {
+      this.interactionId = value;
+      return this;
+    }
+
+    Optional<String> interactionId() {
+      return interactionId;
+    }
+
     public Event build() {
       Event event = new Event();
       event.setId(id);
@@ -604,6 +633,7 @@ public class Event extends JsonBaseModel {
       event.branch(branch);
       event.setGroundingMetadata(groundingMetadata);
       event.setModelVersion(modelVersion);
+      event.setInteractionId(interactionId);
       event.setActions(actions().orElseGet(() -> EventActions.builder().build()));
       event.setTimestamp(timestamp().orElseGet(() -> Instant.now().toEpochMilli()));
       return event;
@@ -639,7 +669,8 @@ public class Event extends JsonBaseModel {
             .interrupted(this.interrupted)
             .branch(this.branch)
             .groundingMetadata(this.groundingMetadata)
-            .modelVersion(this.modelVersion);
+            .modelVersion(this.modelVersion)
+            .interactionId(this.interactionId);
     if (this.timestamp != 0) {
       builder.timestamp(this.timestamp);
     }
@@ -671,7 +702,8 @@ public class Event extends JsonBaseModel {
         && Objects.equals(interrupted, other.interrupted)
         && Objects.equals(branch, other.branch)
         && Objects.equals(groundingMetadata, other.groundingMetadata)
-        && Objects.equals(modelVersion, other.modelVersion);
+        && Objects.equals(modelVersion, other.modelVersion)
+        && Objects.equals(interactionId, other.interactionId);
   }
 
   @Override
@@ -699,6 +731,7 @@ public class Event extends JsonBaseModel {
         branch,
         groundingMetadata,
         modelVersion,
+        interactionId,
         timestamp);
   }
 }

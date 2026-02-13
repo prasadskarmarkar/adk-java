@@ -32,8 +32,9 @@
     <module>contrib/spring-ai</module>
     <module>contrib/samples</module>
     <module>contrib/firestore-session-service</module>
-    <module>tutorials/city-time-weather</module>
+<module>tutorials/city-time-weather</module>
     <module>tutorials/live-audio-single-agent</module>
+    <module>tutorials/interactions-api-demo</module>
     <module>a2a</module>
   </modules>
 

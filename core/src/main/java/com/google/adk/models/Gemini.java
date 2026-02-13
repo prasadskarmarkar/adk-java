@@ -63,6 +63,7 @@ public class Gemini extends BaseLlm {
   }
 
   private final Client apiClient;
+  private final boolean useInteractionsApi;
 
   /**
    * Constructs a new Gemini instance.
@@ -73,6 +74,22 @@ public class Gemini extends BaseLlm {
   public Gemini(String modelName, Client apiClient) {
     super(modelName);
     this.apiClient = Objects.requireNonNull(apiClient, "apiClient cannot be null");
+    this.useInteractionsApi = false;
+  }
+
+  private Gemini(String modelName, Client apiClient, boolean useInteractionsApi) {
+    super(modelName);
+    this.apiClient = Objects.requireNonNull(apiClient, "apiClient cannot be null");
+    this.useInteractionsApi = useInteractionsApi;
+  }
+
+  /**
+   * Returns whether this Gemini instance is configured to use the Interactions API.
+   *
+   * @return true if the Interactions API is enabled.
+   */
+  public boolean useInteractionsApi() {
+    return useInteractionsApi;
   }
 
   /**
@@ -89,6 +106,7 @@ public class Gemini extends BaseLlm {
             .apiKey(apiKey)
             .httpOptions(HttpOptions.builder().headers(TRACKING_HEADERS).build())
             .build();
+    this.useInteractionsApi = false;
   }
 
   /**
@@ -106,6 +124,7 @@ public class Gemini extends BaseLlm {
     vertexCredentials.location().ifPresent(apiClientBuilder::location);
     vertexCredentials.credentials().ifPresent(apiClientBuilder::credentials);
     this.apiClient = apiClientBuilder.build();
+    this.useInteractionsApi = false;
   }
 
   /**
@@ -125,6 +144,7 @@ public class Gemini extends BaseLlm {
     private Client apiClient;
     private String apiKey;
     private VertexCredentials vertexCredentials;
+    private boolean useInteractionsApi;
 
     private Builder() {}
 
@@ -181,6 +201,22 @@ public class Gemini extends BaseLlm {
     }
 
     /**
+     * Sets whether to use the Interactions API instead of the standard GenerateContent API.
+     *
+     * <p>When enabled, {@code generateContent()} delegates to the Interactions API ({@code
+     * client.interactions.create()}) which provides stateful conversation management via {@code
+     * previousInteractionId}, reducing payload size for multi-turn conversations.
+     *
+     * @param useInteractionsApi true to use the Interactions API.
+     * @return This builder.
+     */
+    @CanIgnoreReturnValue
+    public Builder useInteractionsApi(boolean useInteractionsApi) {
+      this.useInteractionsApi = useInteractionsApi;
+      return this;
+    }
+
+    /**
      * Builds the {@link Gemini} instance.
      *
      * @return A new {@link Gemini} instance.
@@ -189,24 +225,48 @@ public class Gemini extends BaseLlm {
     public Gemini build() {
       Objects.requireNonNull(modelName, "modelName must be set.");
 
+      Client client;
       if (apiClient != null) {
-        return new Gemini(modelName, apiClient);
+        client = apiClient;
       } else if (apiKey != null) {
-        return new Gemini(modelName, apiKey);
+        client =
+            Client.builder()
+                .apiKey(apiKey)
+                .httpOptions(HttpOptions.builder().headers(TRACKING_HEADERS).build())
+                .build();
       } else if (vertexCredentials != null) {
-        return new Gemini(modelName, vertexCredentials);
+        Client.Builder apiClientBuilder =
+            Client.builder().httpOptions(HttpOptions.builder().headers(TRACKING_HEADERS).build());
+        vertexCredentials.project().ifPresent(apiClientBuilder::project);
+        vertexCredentials.location().ifPresent(apiClientBuilder::location);
+        vertexCredentials.credentials().ifPresent(apiClientBuilder::credentials);
+        client = apiClientBuilder.build();
       } else {
-        return new Gemini(
-            modelName,
+        client =
             Client.builder()
                 .httpOptions(HttpOptions.builder().headers(TRACKING_HEADERS).build())
-                .build());
+                .build();
       }
+      return new Gemini(modelName, client, useInteractionsApi);
     }
   }
 
   @Override
   public Flowable<LlmResponse> generateContent(LlmRequest llmRequest, boolean stream) {
+    if (useInteractionsApi) {
+      // Ensure model name is set on the request
+      LlmRequest effectiveRequest =
+          llmRequest.model().isPresent()
+              ? llmRequest
+              : llmRequest.toBuilder().model(model()).build();
+      logger.debug(
+          "Using Interactions API for model {} (stream={})",
+          effectiveRequest.model().orElse("unknown"),
+          stream);
+      return GeminiInteractionsUtil.generateContentViaInteractions(
+          apiClient, effectiveRequest, stream);
+    }
+
     llmRequest =
         GeminiUtil.prepareGenenerateContentRequest(
             llmRequest, !apiClient.vertexAI(), /* stripThoughts= */ false);
